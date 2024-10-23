@@ -27,7 +27,7 @@ import "./Board.css";
  *
  **/
 
-function Board({ nrows = 3, ncols = 3, chanceLightStartsOn = 0.25}) {
+function Board({ nrows = 3, ncols = 3, chanceLightStartsOn = 1}) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
@@ -37,9 +37,10 @@ function Board({ nrows = 3, ncols = 3, chanceLightStartsOn = 0.25}) {
     for (let i = 0; i < nrows; i++) {
       let rowArray = []
       for (let j = 0; j < ncols; j++) {
-        const random = (1 == Math.floor(Math.random() * 2) ? true : false);
+        const random = (Math.random() < chanceLightStartsOn) ? true : false;
         rowArray.push(random);
       }
+      initialBoard.push(rowArray)
     }
     return initialBoard;
   }
@@ -48,7 +49,7 @@ function Board({ nrows = 3, ncols = 3, chanceLightStartsOn = 0.25}) {
     // TODO: check the board in state to determine whether the player has won.
     for (let i = 0; i < nrows; i++) {
       for (let j = 0; j < ncols; j++) {
-      if (board[i][j] === false) {
+      if (board[i][j] === true) {
         return false;
         }
       }
@@ -83,36 +84,35 @@ function Board({ nrows = 3, ncols = 3, chanceLightStartsOn = 0.25}) {
   }
 
   // if the game is won, just show a winning msg & render nothing else
-  return (
-    <div className="Board">
-      { hasWon() && 
-        (
-          <h1>You Won!!!</h1>
-        )
-      }
-      // TODO
+  if (hasWon()) {
+    return <h1>You Won!!!</h1>;
+  }
+  // TODO
 
-      // make table board
-      { !hasWon() && 
-        (
-          <div>
-            {board.map((row, rowIndex) => (
-              <div key={rowIndex}>
-                {row.map((col, colIndex) => (
-                  <Cell
-                  key={`${rowIndex}-${colIndex}`}
-                  flipCellsAroundMe={() => flipCellsAround(`${rowIndex}-${colIndex}`)}
-                  isLit={col}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        )
-      }
-      // TODO
-    </div>
-  )
+  // make table board
+
+  let tableBoard = [];
+
+  for (let y = 0; y < nrows; y++) {
+    let row = [];
+    for (let x = 0; x < ncols; x++) {
+      let coord = `${y}-${x}`;
+      row.push(
+          <Cell
+              key={coord}
+              isLit={board[y][x]}
+              flipCellsAroundMe={evt => flipCellsAround(coord)}
+          />,
+      );
+    }
+    tableBoard.push(<tr key={y}>{row}</tr>);
+  }
+
+  return (
+    <table className="Board">
+      <tbody>{tableBoard}</tbody>
+    </table>
+  );
 }
 
 export default Board;

@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <Board nrows={3} ncols={3}/>
+        <Board nrows={5} ncols={5}/>
       </div>
     </>
   );
